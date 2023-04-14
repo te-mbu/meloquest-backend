@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const timeDetailsSchema = mongoose.Schema({
-    date: Date,
     timeStart: Date,
     timeEnd: Date,
    });
