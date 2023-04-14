@@ -70,7 +70,6 @@ router.post('/eventcreation', (req, res) => {
   const newEvent = new Event({
      name : req.body.name,
      timeDetails: {
-      date : req.body.date,
       timeStart : req.body.timeStart,
       timeEnd : req.body.timeEnd
      },
