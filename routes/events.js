@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 const Event = require("../models/events");
 const User = require("../models/users");
+const moment = require("moment")
 
 
 router.get('/cities', (req, res) => {
@@ -49,28 +50,22 @@ router.get('/tonight', (req, res) => {
     // date du jour
     const now = new Date();
     // date d'aujourd'hui à minuit
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 01, 59, 59, 999);
+    // const startOfToday= moment().startOf('day').toDate()
     console.log('start of the day ->', startOfToday)
     // date de fin de soirée (23h59m59s)
-    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 25, 59, 59, 999);
+    // const endOfToday = moment().endOf('day').toDate()
     console.log('end of today ->', endOfToday)
     console.log('now date ->', now.getDate())
-    console.log(endOfToday)
 
 
     Event.find({
         // dates startOfToday et endOfToday pour déterminer la plage de temps à rechercher
-        'timeDetails.date':
-        {
+        'timeDetails.timeStart': {
             $gte: startOfToday,
             $lte: endOfToday
-        },
-
-        'timeDetails.timeStart': {
-            $gte: now,
-            $lte: endOfToday
         }
-
     })
         .then(eventdata => {
             console.log(eventdata)
@@ -87,19 +82,21 @@ router.get('/tonight', (req, res) => {
 // Road for the event of the week 
 router.get('/week', (req, res) => {
     // date du jour
-    const now = new Date();
+    const now = moment();
     console.log(now)
     // variable which get the date of the begginning of the week à partir de Lundi
-    const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() + 2);
+    // const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay()+4);
+    const startOfWeek = now.startOf('isoweek').toDate();
     console.log(startOfWeek)
     // Get the date of the end of the week
-    const endOfWeek = new Date(startOfWeek)
-    endOfWeek.setDate(endOfWeek.getDate() + 6);
+    // const endOfWeek = new Date(startOfWeek)
+    // endOfWeek.setDate(endOfWeek.getDate() + 6);
+    const endOfWeek = now.endOf('isoweek').toDate();
     console.log(endOfWeek)
     // $gte sélectionner tous les événements ayant lieu à partir du début de la semaine ; 
     //$lte pour sélectionner tous les événements ayant lieu jusqu'à la fin de la semaine
     Event.find({
-        'timeDetails.date':
+        'timeDetails.timeStart':
         {
             $gte: startOfWeek,
             $lte: endOfWeek
