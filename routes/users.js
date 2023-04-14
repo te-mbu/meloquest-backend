@@ -62,7 +62,7 @@ router.post("/signin", (req, res) => {
 
 /* POST /users/events */
 router.post('/eventcreation', (req, res) => {
-  if (!checkBody(req.body, ['name', 'date', 'timeStart', 'timeEnd', 'street', 'city', 'venue', 'description', 'genre', 'price'])) {
+  if (!checkBody(req.body, ['name', 'timeStart', 'timeEnd', 'street', 'city', 'venue', 'description', 'genre', 'price'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
     return;
   }
