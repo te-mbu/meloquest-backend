@@ -44,7 +44,6 @@ router.post("/signup", (req, res) => {
 router.post("/signin", (req, res) => {
 
 
-  console.log(req.body)
   // Check if all req.body fields are correctly filled
   if (!checkBody(req.body, ["email", "password"])) {
     res.json({ result: false, error: "Missing or empty fields" });

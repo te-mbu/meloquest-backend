@@ -179,4 +179,17 @@ router.post("/purchased", function (req, res, next) {
     });
 });
 
+router.get('/:clientId', function (req, res) {
+      const { clientId } = req.params;
+      Event.findOne({ _id: clientId })
+        .then(data => {
+            if (data) {
+                res.json({result: true, event: data})
+            } else {
+                res.json({result: false, error: "Event not found"})
+            }
+        })
+  });
+
+
 module.exports = router;
