@@ -185,9 +185,8 @@ router.post("/purchased", function (req, res, next) {
     });
 });
 
-router.get('/:clientId', function (req, res) {
-      const { clientId } = req.params;
-      Event.findOne({ _id: clientId })
+router.get('/:event_id', function (req, res) {
+      Event.findOne({ event_id: req.params.event_id })
         .then(data => {
             if (data) {
                 res.json({result: true, event: data})
