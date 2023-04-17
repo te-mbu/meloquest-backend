@@ -145,7 +145,21 @@ router.post("/liked", function (req, res, next) {
         { event_id: req.body.event_id },
         { $push: { eventLiked: req.body.token } }
     ).then((data) => {
-        if (data.acknowledged) {
+        if (data.modifiedCount > 0) {
+            res.json({ result: true });
+        } else {
+            res.json({ result: false });
+        }
+    });
+});
+
+// POST /events/organiser
+router.post("/organiser", function (req, res, next) {
+    Event.updateOne(
+        { event_id: req.body.event_id },
+        { $push: { organiser: req.body.token } }
+    ).then((data) => {
+        if (data.modifiedCount > 0) {
             res.json({ result: true });
         } else {
             res.json({ result: false });
