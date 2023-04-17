@@ -116,8 +116,6 @@ router.get('/week', (req, res) => {
 })
 
 
-
-
 router.get("/allevents", (req, res) => {
     Event.find().then((city) => {
         res.json({ city });
@@ -169,9 +167,10 @@ router.post("/unliked", function (req, res, next) {
 router.post("/purchased", function (req, res, next) {
     Event.updateOne(
         { event_id: req.body.event_id },
-        { $push: { eventPurchased: req.body.token } }
-    ).then((data) => {
-        if (data.acknowledged) {
+        { $addToSet: { eventPurchased: req.body.token } }
+    )
+    .then((data) => {
+        if (data.modifiedCount > 0) {
             res.json({ result: true });
         } else {
             res.json({ result: false });
