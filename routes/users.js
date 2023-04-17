@@ -65,43 +65,43 @@ router.post('/eventcreation', (req, res) => {
     res.json({ result: false, error: 'Missing or empty fields' });
     return;
   }
-//mettre les dates au format date avec new Date()
+  //mettre les dates au format date avec new Date()
   const newEvent = new Event({
-     name : req.body.name,
-     timeDetails: {
-      timeStart : req.body.timeStart,
-      timeEnd : req.body.timeEnd
-     },
-     address: {
-      street : req.body.street,
+    name: req.body.name,
+    timeDetails: {
+      timeStart: req.body.timeStart,
+      timeEnd: req.body.timeEnd
+    },
+    address: {
+      street: req.body.street,
       city: req.body.city,
       venue: req.body.venue,
-     },
-     description: req.body.description,
-     genre: req.body.genre,
-     price: req.body.price,
-     event_id: uid2(32),
-    });
+    },
+    description: req.body.description,
+    genre: req.body.genre,
+    price: req.body.price,
+    event_id: uid2(32),
+  });
 
   newEvent.save()
     .then((data) => {
-    res.json({ result: true, event_id: data.event_id});
-  });
+      res.json({ result: true, event_id: data.event_id });
+    });
 });
 
 router.delete("/:token", (req, res) => {
-  User.deleteOne({token: req.params.token})
+  User.deleteOne({ token: req.params.token })
     // if (deletedDoc.deletedCount > 0) ne fonctionne qu'avec deleteMany
-      .then(deletedDoc => {
-        if (deletedDoc) {
-      // document successfully deleted
+    .then(deletedDoc => {
+      if (deletedDoc) {
+        // document successfully deleted
         User.find().then(user => {
-        res.json({ result: true,  user}); // le user:user va servir pour le front.
-      });
-    } else {
-      res.json({ result: false, error: "Utilisateur non trouvé" });
-    }
-  });
+          res.json({ result: true, user }); // le user:user va servir pour le front.
+        });
+      } else {
+        res.json({ result: false, error: "Utilisateur non trouvé" });
+      }
+    });
 });
 
 module.exports = router;
