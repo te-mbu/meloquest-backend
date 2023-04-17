@@ -48,23 +48,31 @@ router.get('/id', (req, res) => {
 // route filtre event pour récupérer les événements de ce soir//
 router.get('/tonight', (req, res) => {
     // date du jour
-    const now = new Date();
+    // const now = new Date();
+    const now = moment();
+    console.log(now)
     // date d'aujourd'hui à minuit
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 01, 59, 59, 999);
-    // const startOfToday= moment().startOf('day').toDate()
-    console.log('start of the day ->', startOfToday)
+    // const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 01, 59, 59, 999);
+    // const startOfToday = moment().startOf('isoday').add(2,'hour' ).toDate();
+    const startOfToday= moment().startOf('day').toDate()
+    console.log('start of the day ->', startOfToday.toString())
     // date de fin de soirée (23h59m59s)
-    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 25, 59, 59, 999);
-    // const endOfToday = moment().endOf('day').toDate()
-    console.log('end of today ->', endOfToday)
-    console.log('now date ->', now.getDate())
+    // const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 25, 59, 59, 999);
+    const endOfToday = moment().endOf('day').toDate()
+    console.log('end of today ->', endOfToday.toString())
+    // console.log('now date ->', now.getDate())
 
 
     Event.find({
         // dates startOfToday et endOfToday pour déterminer la plage de temps à rechercher
         'timeDetails.timeStart': {
-            $gte: startOfToday,
+
+            $gte: now.toDate(),
             $lte: endOfToday
+        },
+        'timeDetails.timeEnd': {
+            $lte: endOfToday,
+            $gte: now.toDate()
         }
     })
         .then(eventdata => {
@@ -78,27 +86,30 @@ router.get('/tonight', (req, res) => {
 });
 
 
-
 // Road for the event of the week 
 router.get('/week', (req, res) => {
     // date du jour
     const now = moment();
     console.log(now)
-    // variable which get the date of the begginning of the week à partir de Lundi
-    // const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay()+4);
-    const startOfWeek = now.startOf('isoweek').toDate();
-    console.log(startOfWeek)
-    // Get the date of the end of the week
-    // const endOfWeek = new Date(startOfWeek)
-    // endOfWeek.setDate(endOfWeek.getDate() + 6);
-    const endOfWeek = now.endOf('isoweek').toDate();
-    console.log(endOfWeek)
-    // $gte sélectionner tous les événements ayant lieu à partir du début de la semaine ; 
-    //$lte pour sélectionner tous les événements ayant lieu jusqu'à la fin de la semaine
+
+    // commence le week à 00h début de journée (pb de fuseau)
+    const startOfWeek = moment().startOf('isoweek').subtract(22,'hour' ).toDate();
+    console.log(startOfWeek.toString())
+
+    // finis le week à 00h fin de journée 
+    const endOfWeek = moment(startOfWeek).add(7,'day').toDate(); // plus 1j pour commencer le lendemain matin
+    console.log(endOfWeek.toString())
+    
     Event.find({
         'timeDetails.timeStart':
         {
-            $gte: startOfWeek,
+            $gte: now.toDate(), // supérieur ou égale
+            $lte: endOfWeek // inférieur ou égale méthode DB
+        },
+
+        'timeDetails.timeEnd':
+        {
+            $gte: now.toDate(),
             $lte: endOfWeek
         }
     })
@@ -111,9 +122,6 @@ router.get('/week', (req, res) => {
             }
         })
 })
-
-
-
 
 router.get("/allevents", (req, res) => {
     Event.find().then((city) => {
