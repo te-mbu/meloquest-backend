@@ -218,6 +218,19 @@ router.get("/purchased/:token", function (req, res) {
   });
 });
 
+router.get("/organiser/:token", function (req, res) {
+  Event.find({
+    $or: [{ organiser: { $in: [req.params.token] } }],
+  }).then((data) => {
+    if (data) {
+      res.json({ result: true, data: data });
+    } else {
+      res.json({ result: false });
+    }
+  });
+});
+
+
 router.post("/search", function (req, res) {
   const msg = req.body.searchMsg;
   const keywords = msg.split(" ");
