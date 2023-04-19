@@ -4,6 +4,10 @@ const Event = require("../models/events");
 const User = require("../models/users");
 const moment = require("moment");
 
+const cloudinary = require('cloudinary').v2;
+const uniqid = require('uniqid');
+const fs = require('fs');
+
 router.get("/cities", (req, res) => {
   Event.find({}, "address.city").then((data) => {
     let allCities = [];
@@ -223,7 +227,13 @@ router.get("/organiser/:token", function (req, res) {
     $or: [{ organiser: { $in: [req.params.token] } }],
   }).then((data) => {
     if (data) {
-      res.json({ result: true, data: data });
+      let likes = []
+      let purchases = []
+      for (let event of data) {
+        likes.push(event.eventLiked.length)
+        purchases.push(event.eventPurchased.length)
+      }
+      res.json({ result: true, data: data, likes: likes, purchases: purchases });
     } else {
       res.json({ result: false });
     }
@@ -261,5 +271,25 @@ router.post("/search", function (req, res) {
     }
   });
 });
+
+
+router.post('/upload', async (req, res) => {
+  const photoPath = `/tmp/${uniqid()}.jpg`;
+  const resultMove = await req.files.photoFromFront.mv(photoPath);
+
+  if (!resultMove) {
+    const resultCloudinary = await cloudinary.uploader.upload(photoPath);
+    res.json({ result: true, url: resultCloudinary.secure_url });
+  } else {
+    res.json({ result: false, error: resultMove });
+  }
+
+  fs.unlinkSync(photoPath);
+
+
+  
+
+});
+
 
 module.exports = router;
