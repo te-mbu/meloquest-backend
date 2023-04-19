@@ -274,7 +274,7 @@ router.post("/search", function (req, res) {
 
 
 router.post('/upload', async (req, res) => {
-  const photoPath = `/tmp/${uniqid()}.jpg`;
+  const photoPath = `./tmp/${uniqid()}.jpg`;
   const resultMove = await req.files.photoFromFront.mv(photoPath);
 
   if (!resultMove) {
