@@ -207,15 +207,59 @@ router.get("/liked/:token", function (req, res) {
 });
 
 router.get("/purchased/:token", function (req, res) {
-    Event.find({
-      $or: [{ eventPurchased: { $in: [req.params.token] } }],
-    }).then((data) => {
-      if (data) {
-        res.json({ result: true, data: data });
-      } else {
-        res.json({ result: false });
-      }
-    });
+  Event.find({
+    $or: [{ eventPurchased: { $in: [req.params.token] } }],
+  }).then((data) => {
+    if (data) {
+      res.json({ result: true, data: data });
+    } else {
+      res.json({ result: false });
+    }
   });
+});
+
+router.get("/organiser/:token", function (req, res) {
+  Event.find({
+    $or: [{ organiser: { $in: [req.params.token] } }],
+  }).then((data) => {
+    if (data) {
+      res.json({ result: true, data: data });
+    } else {
+      res.json({ result: false });
+    }
+  });
+});
+
+
+router.post("/search", function (req, res) {
+  const msg = req.body.searchMsg;
+  const keywords = msg.split(" ");
+
+  Event.find({
+    $and: keywords.map((keyword) => ({
+      $or: [
+        { name: { $regex: keyword.replace(/[eé]/gi, "[eé]"), $options: "i" } },
+        {
+          "address.venue": {
+            $regex: keyword.replace(/[eé]/gi, "[eé]"),
+            $options: "i",
+          },
+        },
+        {
+          "address.city": {
+            $regex: keyword.replace(/[eé]/gi, "[eé]"),
+            $options: "i",
+          },
+        },
+      ],
+    })),
+  }).then((data) => {
+    if (data) {
+      res.json({ result: true, data: data });
+    } else {
+      res.json({ result: false });
+    }
+  });
+});
 
 module.exports = router;
