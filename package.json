@@ -25,11 +25,7 @@
     "react-native-screens": "^3.20.0",
     "react-redux": "^8.0.5",
     "uid2": "^1.0.0",
-<<<<<<< HEAD
-    "uniqid": "^5.4.0"
-=======
     "uniqid": "^5.4.0",
     "yarn": "^1.22.19"
->>>>>>> d0439ae10a4fda936186f1ef3d931b9b0a85381a
   }
 }
