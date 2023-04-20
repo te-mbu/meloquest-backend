@@ -20,6 +20,7 @@ const eventSchema = mongoose.Schema({
   description: String,
   genre: Array,
   price: Number,
+  url: String,
   event_id: String,
   isDone: Boolean,
   profilePicture: String,

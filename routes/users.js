@@ -85,6 +85,7 @@ router.post('/eventcreation', (req, res) => {
     genre: req.body.genre,
     price: req.body.price,
     event_id: uid2(32),
+    url: req.body.url
   });
 
   newEvent.save()
