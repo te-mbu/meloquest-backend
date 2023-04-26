@@ -1,66 +1,30 @@
 var express = require("express");
 var router = express.Router();
 const Event = require("../models/events");
-const User = require("../models/users");
 const moment = require("moment");
 
-const cloudinary = require('cloudinary').v2;
-const uniqid = require('uniqid');
-const fs = require('fs');
+const cloudinary = require("cloudinary").v2;
+const uniqid = require("uniqid");
+const fs = require("fs");
 
-router.get("/cities", (req, res) => {
-  Event.find({}, "address.city").then((data) => {
-    let allCities = [];
-    for (let el of data) {
-      if (!allCities.includes(el.address.city)) {
-        allCities.push(el.address.city);
-      }
-    }
-    let result = [];
-    for (let i = 0; i < allCities.length; i++) {
-      let value = i + 1;
-      result.push({ city: allCities[i], value: value.toString() });
-      console.log(result);
-    }
-    res.json({ cities: result });
-  });
-});
-
+// Get all events
+// GET /events/allevents
 router.get("/allevents", (req, res) => {
   Event.find().then((city) => {
     res.json({ city });
   });
 });
 
-router.get("/id", (req, res) => {
-  Event.findOne({ event_id: req.body.event_id }).then((data) => {
-    if (data) {
-      res.json({ result: true, event: data });
-    } else {
-      res.json({ result: false, error: "Event not find" });
-    }
-  });
-});
-
-// route filtre event pour récupérer les événements de ce soir//
+// Récupérer les événements de ce soir
+// GET /events/tonight
 router.get("/tonight", (req, res) => {
   // date du jour
-  // const now = new Date();
   const now = moment();
-  console.log(now);
-  // date d'aujourd'hui à minuit
-  // const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 01, 59, 59, 999);
-  // const startOfToday = moment().startOf('isoday').add(2,'hour' ).toDate();
-  const startOfToday = moment().startOf("day").toDate();
-  console.log("start of the day ->", startOfToday.toString());
   // date de fin de soirée (23h59m59s)
-  // const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 25, 59, 59, 999);
   const endOfToday = moment().endOf("day").toDate();
-  console.log("end of today ->", endOfToday.toString());
-  // console.log('now date ->', now.getDate())
 
   Event.find({
-    // dates startOfToday et endOfToday pour déterminer la plage de temps à rechercher
+    // dates now et endOfToday pour déterminer la plage de temps à rechercher
     "timeDetails.timeStart": {
       $gte: now.toDate(),
       $lte: endOfToday,
@@ -80,25 +44,20 @@ router.get("/tonight", (req, res) => {
 });
 
 // Road for the event of the week
+// GET /events/week
 router.get("/week", (req, res) => {
   // date du jour
   const now = moment();
-  console.log(now);
-
   // commence le week à 00h début de journée (pb de fuseau)
   const startOfWeek = moment().startOf("isoweek").subtract(22, "hour").toDate();
-  console.log(startOfWeek.toString());
-
   // finis le week à 00h fin de journée
   const endOfWeek = moment(startOfWeek).add(7, "day").toDate(); // plus 1j pour commencer le lendemain matin
-  console.log(endOfWeek.toString());
 
   Event.find({
     "timeDetails.timeStart": {
       $gte: now.toDate(), // supérieur ou égale
       $lte: endOfWeek, // inférieur ou égale méthode DB
     },
-
     "timeDetails.timeEnd": {
       $gte: now.toDate(),
       $lte: endOfWeek,
@@ -113,22 +72,7 @@ router.get("/week", (req, res) => {
   });
 });
 
-router.get("/allevents", (req, res) => {
-  Event.find().then((city) => {
-    res.json({ city });
-  });
-});
-
-router.get("/id", (req, res) => {
-  Event.findOne({ event_id: req.body.event_id }).then((data) => {
-    if (data) {
-      res.json({ result: true, event: data });
-    } else {
-      res.json({ result: false, error: "Event non trouvé" });
-    }
-  });
-});
-
+// Add organiser token to eventLiked
 // POST /events/liked
 router.post("/liked", function (req, res, next) {
   Event.updateOne(
@@ -143,6 +87,7 @@ router.post("/liked", function (req, res, next) {
   });
 });
 
+// Add organiser token to organiser
 // POST /events/organiser
 router.post("/organiser", function (req, res, next) {
   Event.updateOne(
@@ -157,6 +102,7 @@ router.post("/organiser", function (req, res, next) {
   });
 });
 
+// Retrieve organiser token from eventLiked
 // POST /events/unliked
 router.post("/unliked", function (req, res, next) {
   Event.updateOne(
@@ -174,6 +120,7 @@ router.post("/unliked", function (req, res, next) {
   });
 });
 
+// Add organiser token to eventPurchased
 // POST /events/purchased
 router.post("/purchased", function (req, res, next) {
   Event.updateOne(
@@ -188,6 +135,8 @@ router.post("/purchased", function (req, res, next) {
   });
 });
 
+// Get events infos by event_id
+// GET /events/:event_id
 router.get("/:event_id", function (req, res) {
   Event.findOne({ event_id: req.params.event_id }).then((data) => {
     if (data) {
@@ -198,6 +147,8 @@ router.get("/:event_id", function (req, res) {
   });
 });
 
+// Get all events liked by a specific user
+// GET /events/liked/:token
 router.get("/liked/:token", function (req, res) {
   Event.find({
     $or: [{ eventLiked: { $in: [req.params.token] } }],
@@ -210,6 +161,8 @@ router.get("/liked/:token", function (req, res) {
   });
 });
 
+// Get all events purchased by a specific user
+// GET /events/purchased/:token
 router.get("/purchased/:token", function (req, res) {
   Event.find({
     $or: [{ eventPurchased: { $in: [req.params.token] } }],
@@ -227,20 +180,26 @@ router.get("/organiser/:token", function (req, res) {
     $or: [{ organiser: { $in: [req.params.token] } }],
   }).then((data) => {
     if (data) {
-      let likes = []
-      let purchases = []
+      let likes = [];
+      let purchases = [];
       for (let event of data) {
-        likes.push(event.eventLiked.length)
-        purchases.push(event.eventPurchased.length)
+        likes.push(event.eventLiked.length);
+        purchases.push(event.eventPurchased.length);
       }
-      res.json({ result: true, data: data, likes: likes, purchases: purchases });
+      res.json({
+        result: true,
+        data: data,
+        likes: likes,
+        purchases: purchases,
+      });
     } else {
       res.json({ result: false });
     }
   });
 });
 
-
+// Search for a specific event by name/venue/city
+// POST /events/search
 router.post("/search", function (req, res) {
   const msg = req.body.searchMsg;
   const keywords = msg.split(" ");
@@ -272,8 +231,9 @@ router.post("/search", function (req, res) {
   });
 });
 
-
-router.post('/upload', async (req, res) => {
+// Upload a photo to cloudinary
+// POST /events/upload
+router.post("/upload", async (req, res) => {
   const photoPath = `./tmp/${uniqid()}.jpg`;
   const resultMove = await req.files.photoFromFront.mv(photoPath);
 
@@ -283,13 +243,7 @@ router.post('/upload', async (req, res) => {
   } else {
     res.json({ result: false, error: resultMove });
   }
-
   fs.unlinkSync(photoPath);
-
-
-  
-
 });
-
 
 module.exports = router;
