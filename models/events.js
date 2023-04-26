@@ -9,7 +9,6 @@ const addressSchema = mongoose.Schema({
     venue: String,
     street: String,
     city: String,
-    venue: String,
    });
 
 const eventSchema = mongoose.Schema({
