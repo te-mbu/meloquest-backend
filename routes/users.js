@@ -7,7 +7,7 @@ const { checkBody } = require("../modules/checkBody");
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
 
-/* POST /users/signup */
+// POST /users/signup
 router.post("/signup", (req, res) => {
   // Check if all req.body fields are correctly filled
   if (!checkBody(req.body, ["email", "username", "password"])) {
@@ -40,9 +40,8 @@ router.post("/signup", (req, res) => {
   );
 });
 
-/* POST /users/signin */
+// POST /users/signin
 router.post("/signin", (req, res) => {
-
 
   // Check if all req.body fields are correctly filled
   if (!checkBody(req.body, ["email", "password"])) {
@@ -59,7 +58,7 @@ router.post("/signin", (req, res) => {
   });
 });
 
-/* POST /users/events */
+// POST /users/eventcreation
 router.post('/eventcreation', (req, res) => {
   if (!checkBody(req.body, ['name', 'timeStart', 'timeEnd', 'street', 'city', 'venue', 'description', 'genre', 'price'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
@@ -90,6 +89,7 @@ router.post('/eventcreation', (req, res) => {
     });
 });
 
+// DELETE /users/:token
 router.delete("/:token", (req, res) => {
   User.deleteOne({ token: req.params.token })
     // if (deletedDoc.deletedCount > 0) ne fonctionne qu'avec deleteMany
@@ -97,7 +97,7 @@ router.delete("/:token", (req, res) => {
       if (deletedDoc) {
         // document successfully deleted
         User.find().then(user => {
-          res.json({ result: true, user }); // le user:user va servir pour le front.
+          res.json({ result: true, user });
         });
       } else {
         res.json({ result: false, error: "Utilisateur non trouvé" });
