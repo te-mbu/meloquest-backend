@@ -6,9 +6,8 @@ const cloudinary = require('cloudinary').v2;
 const uniqid = require('uniqid');
 const fs = require('fs');
 
-
+// POST /sendPic/upload
 router.post('/upload', async (req, res) => {
-    console.log(req.files)
     const photoPath = `/tmp/${uniqid()}.jpg`;
     const resultMove = await req.files.photoFromFront.mv(photoPath);
    
