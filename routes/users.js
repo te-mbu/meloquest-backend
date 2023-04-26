@@ -89,20 +89,4 @@ router.post('/eventcreation', (req, res) => {
     });
 });
 
-// DELETE /users/:token
-router.delete("/:token", (req, res) => {
-  User.deleteOne({ token: req.params.token })
-    // if (deletedDoc.deletedCount > 0) ne fonctionne qu'avec deleteMany
-    .then(deletedDoc => {
-      if (deletedDoc) {
-        // document successfully deleted
-        User.find().then(user => {
-          res.json({ result: true, user });
-        });
-      } else {
-        res.json({ result: false, error: "Utilisateur non trouvé" });
-      }
-    });
-});
-
 module.exports = router;

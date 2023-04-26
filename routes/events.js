@@ -175,15 +175,19 @@ router.get("/purchased/:token", function (req, res) {
   });
 });
 
+// Get organiser informations
 router.get("/organiser/:token", function (req, res) {
   Event.find({
+    // Find all events with specific token in organiser array
     $or: [{ organiser: { $in: [req.params.token] } }],
   }).then((data) => {
     if (data) {
       let likes = [];
       let purchases = [];
       for (let event of data) {
+        // Get nb of likes (length of eventLiked array)
         likes.push(event.eventLiked.length);
+        // Get nb of purchases (length of eventPurchased array)
         purchases.push(event.eventPurchased.length);
       }
       res.json({
