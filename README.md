@@ -14,3 +14,6 @@ Les utilisateurs peuvent explorer les événements à venir, aimer ceux qui les 
 * Redux
 * MongoDB
 * Vercel
+
+
+[Térence MBU - Dossier MeloQuest.pdf](https://github.com/te-mbu/meloquest-backend/files/11551819/Terence.MBU.-.Dossier.MeloQuest.pdf)
